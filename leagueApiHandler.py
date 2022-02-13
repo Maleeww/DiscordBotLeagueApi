@@ -1,74 +1,73 @@
 import requests
 
-API = "RGAPI-a1682f06-5d33-4969-9ea8-e99cdabe10ba"
+# Need to change API key every 24h 
+# https://developer.riotgames.com/
+API = "RGAPI-f3cc52f6-5fc0-43e2-b6dc-671a96175002"
 region = "euw1"
+# https://developer.riotgames.com/docs/lol
 
 
 def regionn(palabra):
+    # Change region for the code to use, by default "euw1"
+    # Options: br1 eun1 euw1 jp1 kr la1 la2 na1 oc1 ru
+    global region 
     region = palabra
 
 
 def ID(Summoner):
+    # Get ID from summoner name
     URL = "https://" + region + ".api.riotgames.com/lol/summoner/v4/summoners/by-name/" + Summoner + "?api_key=" + API
     r = requests.get(URL)
-    # print URL
     idd = r.json()["id"]
-    # print id
     return idd
 
 
 def summonerInfo(Summoner):
+    # Get all JSON info from summoner name
     URL = "https://" + region + ".api.riotgames.com/lol/summoner/v4/summoners/by-name/" + Summoner + "?api_key=" + API
     r = requests.get(URL)
     return r.json()
 
 
 def accountId(Summoner):
+    # Get account ID from summoner name
     URL = "https://" + region + ".api.riotgames.com/lol/summoner/v4/summoners/by-name/" + Summoner + "?api_key=" + API
     r = requests.get(URL)
-    # print URL
     return r.json()["accountId"]
 
     
 def Matchlist(accountId):
-    # print accountId
+    # Get match list (history) from accId
     URL = "https://" + region + ".api.riotgames.com/lol/match/v4/matchlists/by-account/" + accountId + "?api_key=" + API
     r = requests.get(URL)
     return r.json()
 
 
 def matchInfo(gameId):
+    # Get match info from gameId
     URL = "https://" + region + ".api.riotgames.com/lol/match/v4/matches/" + gameId + "?api_key=" + API
     r = requests.get(URL)
     return r.json()
 
     
-def spectator(id):
-    URL = "https://" + region + ".api.riotgames.com/lol/spectator/v4/active-games/by-summoner/" + id + "?api_key=" + API
+def spectator(idd):
+    # Get active game (spectate) from user id
+    URL = "https://" + region + ".api.riotgames.com/lol/spectator/v4/active-games/by-summoner/" + idd + "?api_key=" + API
     r = requests.get(URL)
-    # print(URL)
     return r.json()
 
-def league(id):
-    URL = "https://" + region + ".api.riotgames.com/lol/league/v4/entries/by-summoner/" + id + "?api_key=" + API
+def league(idd):
+    # Get active season's league from user id
+    URL = "https://" + region + ".api.riotgames.com/lol/league/v4/entries/by-summoner/" + idd + "?api_key=" + API
     r = requests.get(URL)
-    # print URL
     return r.json()
 
 
 def rangos(Summoner):
-    # Summoner=str(raw_input("Summoner"))
-    # Summoner="WhiiteRaabbit"
+    # Get team's and enemy team's active season's ranks from one of their summoner names
     idd = ID(Summoner)
     salida = ("")
-    # accountIdd=accountId(Summoner)
-    # Matchlist = Matchlist(accountId)
-    # print Matchlist["matches"][0]
-    # gameId = Matchlist["matches"][0]["gameId"]
-    # print gameId
-    # matchInfo(gameId)
     spec = spectator(idd)
-    # print spec
     try:
         specTeams = spec["participants"]
     except Exception as error:
@@ -80,11 +79,10 @@ def rangos(Summoner):
             summonerName = specTeams[i]["summonerName"]
             info = summonerInfo(summonerName)
             nivel = info["summonerLevel"]
-            id = info["id"]
+            idd = info["id"]
             try:
-                liga = league(id)[0]
+                liga = league(idd)[0]
             except IndexError:
-                # salida+=str((i+1, summonerName,"Nivel "+ str(nivel),'\n'))
                 salida += str(i + 1)
                 salida += (". ")
                 salida += str(summonerName)
@@ -93,7 +91,6 @@ def rangos(Summoner):
             else:
                 tier = liga["tier"]
                 rank = liga["rank"]
-                # salida+=str((i+1, summonerName +":","Nivel "+ str(nivel),", Rango "+tier, rank,'\n'))
                 salida += str(i + 1)
                 salida += (". ")
                 salida += str(summonerName) 
@@ -106,9 +103,9 @@ def rangos(Summoner):
             summonerName = specTeams[i]["summonerName"]
             info = summonerInfo(summonerName)
             nivel = info["summonerLevel"]
-            id = info["id"]
+            idd = info["id"]
             try:
-                liga = league(id)[0]
+                liga = league(idd)[0]
             except IndexError:
                 salida += str(i + 1)
                 salida += (". ")
